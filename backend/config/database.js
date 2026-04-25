@@ -14,21 +14,22 @@ if (!uri && process.env.MONGO_USER && process.env.MONGO_PASS && (process.env.MON
 
 const connectDB = async () => {
   if (!uri) {
-    console.error('❌ MongoDB connection string is not defined.\nPlease create a `.env` file at the project root and set `MONGODB_URI` (see backend/.env.example).');
-    process.exit(1);
+    console.error('❌ MongoDB connection string is not defined.');
+    return; // Don't exit in serverless
   }
 
   try {
+    if (mongoose.connection.readyState >= 1) return;
+    
     const conn = await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
 
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
-    console.log(`📊 Database: ${conn.connection.name}`);
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error.message);
-    process.exit(1);
+    // Don't exit process in Vercel functions
   }
 };
 
@@ -43,13 +44,6 @@ mongoose.connection.on('error', (err) => {
 
 mongoose.connection.on('disconnected', () => {
   console.log('⚠️  Mongoose disconnected from MongoDB');
-});
-
-// Graceful shutdown
-process.on('SIGINT', async () => {
-  await mongoose.connection.close();
-  console.log('MongoDB connection closed due to app termination');
-  process.exit(0);
 });
 
 module.exports = connectDB;

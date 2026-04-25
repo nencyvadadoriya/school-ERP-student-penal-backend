@@ -4,6 +4,8 @@ const fs = require('fs');
 
 const setupFirebase = () => {
   try {
+    if (admin.apps.length) return; // Already initialized
+
     const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH || path.join(__dirname, '../config/serviceAccountKey.json');
     
     if (fs.existsSync(serviceAccountPath)) {
@@ -11,8 +13,18 @@ const setupFirebase = () => {
         credential: admin.credential.cert(require(serviceAccountPath))
       });
       console.log('Firebase Admin SDK initialized');
+    } else if (process.env.FIREBASE_PROJECT_ID) {
+      // Initialize from env variables if file doesn't exist
+      admin.initializeApp({
+        credential: admin.credential.cert({
+          projectId: process.env.FIREBASE_PROJECT_ID,
+          clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+          privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
+        })
+      });
+      console.log('Firebase Admin SDK initialized via Environment Variables');
     } else {
-      console.warn('Firebase service account key not found at:', serviceAccountPath, '. Push notifications will not work via Firebase.');
+      console.warn('Firebase credentials not found. Push notifications will not work.');
     }
   } catch (error) {
     console.error('Error initializing Firebase Admin SDK:', error.message);
