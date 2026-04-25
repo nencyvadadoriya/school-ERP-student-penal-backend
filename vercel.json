@@ -2,12 +2,12 @@
   "version": 2,
   "rewrites": [
     {
-      "source": "/(.*)",
-      "destination": "api/server.js"
+      "source": "/api/(.*)",
+      "destination": "backend/server.js"
     }
   ],
   "functions": {
-    "api/server.js": {
+    "backend/server.js": {
       "maxDuration": 10
     }
   }
