@@ -13,14 +13,19 @@ if (!uri && process.env.MONGO_USER && process.env.MONGO_PASS && (process.env.MON
 }
 
 const connectDB = async () => {
+  console.log('Attempting to connect to MongoDB...');
   if (!uri) {
     console.error('❌ MongoDB connection string is not defined.');
-    return; // Don't exit in serverless
+    return;
   }
 
   try {
-    if (mongoose.connection.readyState >= 1) return;
+    if (mongoose.connection.readyState >= 1) {
+      console.log('Using existing MongoDB connection');
+      return;
+    }
     
+    console.log('Creating new MongoDB connection...');
     const conn = await mongoose.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -29,7 +34,6 @@ const connectDB = async () => {
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error('❌ MongoDB Connection Error:', error.message);
-    // Don't exit process in Vercel functions
   }
 };
 
