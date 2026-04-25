@@ -5,7 +5,6 @@ const path = require('path');
 require('dotenv').config();
 
 const { setupFirebase } = require('./utils/firebase');
-const connectDB = require('./config/database');
 const app = express();
 console.log('Initializing services...');
 try {
@@ -13,13 +12,6 @@ try {
   console.log('Firebase initialized');
 } catch (e) {
   console.error('Firebase init failed:', e);
-}
-
-try {
-  connectDB();
-  console.log('Database connection initiated');
-} catch (e) {
-  console.error('Database init failed:', e);
 }
 
 const adminRoutes = require('./routes/adminRoutes');

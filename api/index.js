@@ -1,10 +1,33 @@
+// Vercel serverless entry point
+const connectDB = require('../backend/config/database');
+
+let app;
+let isConnected = false;
+
 try {
   console.log('Loading backend server...');
-  const app = require('../backend/server');
+  app = require('../backend/server');
   console.log('Backend server loaded successfully.');
-  module.exports = app;
 } catch (error) {
   console.error('CRITICAL ERROR during function initialization:', error);
-  // Re-throw to ensure Vercel sees the failure but with logs
-  throw error;
+  module.exports = (req, res) => {
+    res.status(500).json({
+      success: false,
+      message: 'Server initialization failed',
+      error: error.message,
+    });
+  };
+  return;
 }
+
+module.exports = async (req, res) => {
+  if (!isConnected) {
+    try {
+      await connectDB();
+      isConnected = true;
+    } catch (err) {
+      console.error('Database connection failed:', err);
+    }
+  }
+  return app(req, res);
+};
