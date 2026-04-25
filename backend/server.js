@@ -52,6 +52,7 @@ app.use('/api/subject', subjectRoutes);
 
 
 
+app.get('/', (req, res) => res.json({ success: true, message: 'School ERP API is running', endpoints: '/api/admin, /api/teacher, /api/student, /health', timestamp: new Date() }));
 app.get('/health', (req, res) => res.json({ success: true, message: 'School ERP API running', timestamp: new Date() }));
 app.use((req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
 app.use((error, req, res, next) => {
