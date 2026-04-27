@@ -98,8 +98,6 @@ teacherSchema.pre('save', async function(next) {
 });
 
 // Indexes
-teacherSchema.index({ teacher_code: 1 });
-teacherSchema.index({ email: 1 });
 teacherSchema.index({ is_delete: 1 });
 
 module.exports = mongoose.model('Teacher', teacherSchema);

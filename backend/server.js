@@ -53,7 +53,22 @@ app.use('/api/subject', subjectRoutes);
 
 
 app.get('/', (req, res) => res.json({ success: true, message: 'School ERP API is running', endpoints: '/api/admin, /api/teacher, /api/student, /health', timestamp: new Date() }));
-app.get('/health', (req, res) => res.json({ success: true, message: 'School ERP API running', timestamp: new Date() }));
+app.get('/health', (req, res) => {
+  const mongoose = require('mongoose');
+  const dbStatus = mongoose.connection.readyState;
+  const statusMap = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+  };
+  res.json({ 
+    success: true, 
+    message: 'School ERP API running', 
+    database: statusMap[dbStatus] || 'unknown',
+    timestamp: new Date() 
+  });
+});
 app.use((req, res) => res.status(404).json({ success: false, message: 'Route not found' }));
 app.use((error, req, res, next) => {
   console.error('Error:', error);
@@ -63,7 +78,13 @@ app.use((error, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 if (require.main === module) {
-  app.listen(PORT, () => console.log(`🎓 School ERP API running on port ${PORT}`));
+  const connectDB = require('./config/database');
+  connectDB().then(() => {
+    app.listen(PORT, () => console.log(`🎓 School ERP API running on port ${PORT}`));
+  }).catch(err => {
+    console.error('Failed to connect to database. Server not started.', err);
+    process.exit(1);
+  });
 }
 
 module.exports = app;

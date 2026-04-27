@@ -27,6 +27,11 @@ module.exports = async (req, res) => {
       isConnected = true;
     } catch (err) {
       console.error('Database connection failed:', err);
+      return res.status(500).json({
+        success: false,
+        message: 'Database connection failed',
+        error: err.message,
+      });
     }
   }
   return app(req, res);

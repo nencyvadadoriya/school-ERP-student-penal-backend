@@ -46,7 +46,6 @@ const adminSchema = new mongoose.Schema({
 });
 
 // Index for better query performance
-adminSchema.index({ email: 1 });
 adminSchema.index({ is_delete: 1 });
 
 module.exports = mongoose.model('Admin', adminSchema);

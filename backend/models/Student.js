@@ -98,7 +98,6 @@ const studentSchema = new mongoose.Schema({
 });
 
 // Indexes
-studentSchema.index({ gr_number: 1 });
 studentSchema.index({ class_code: 1 });
 studentSchema.index({ is_delete: 1 });
 
